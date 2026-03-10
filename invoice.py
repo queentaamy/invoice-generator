@@ -1,29 +1,44 @@
 welcome_msg = "Welcome to invoice generator!\nProgram started successfully!"
 print(welcome_msg)
 
-# Feature 1
-def bussiness_setup ():
-    client_name = input ("Please enter your name: ")
-    client_email = input ("Please enter your email: ")
-    client_address = input ("Please enter your address: ")
-    client_phone_number = input ("Please enter your phone number: ")
 
-    bussiness_profile = {
-    "name": client_name,
-    "email": client_email,
-    "address": client_address,
-    "phone_number": client_phone_number
-}
+# Feature 1 — Business Profile Setup
+def business_setup():
+    business_name = input("Please enter your business name: ")
+    business_email = input("Please enter your business email: ")
+    business_address = input("Please enter your business address: ")
+    business_phone_number = input("Please enter your business phone number: ")
 
-    print ("Your bussiness information has been saved successfully!")
-    print ("Name: ", bussiness_profile["name"])
-    print ("Email: ", bussiness_profile["email"])
-    print ("Address: ", bussiness_profile["address"])
-    print ("Phone number: ", bussiness_profile["phone_number"])
-    
-    return bussiness_profile
+    business_profile = {
+        "name": business_name,
+        "email": business_email,
+        "address": business_address,
+        "phone_number": business_phone_number
+    }
+
+    print("\nYour business information has been created!")
+    print("Name:", business_profile["name"])
+    print("Email:", business_profile["email"])
+    print("Address:", business_profile["address"])
+    print("Phone number:", business_profile["phone_number"])
+
+    return business_profile
+
+
+# Saving the Data to 'business_profile.txt' File
+def save_business_profile(profile):
+    with open("business_profile.txt", "w") as file:
+        file.write("Name: " + profile["name"] + "\n")
+        file.write("Email: " + profile["email"] + "\n")
+        file.write("Address: " + profile["address"] + "\n")
+        file.write("Phone number: " + profile["phone_number"] + "\n")
+
+    print("Profile saved successfully!")
+
+
 def main():
-    bussiness_setup()
+    profile = business_setup()
+    save_business_profile(profile)
 
 
 main()
