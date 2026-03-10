@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 welcome_msg = "Welcome to invoice generator!\nProgram started successfully!"
 print(welcome_msg)
 
@@ -76,6 +78,20 @@ def get_client_details():
 
     return client
 
+def get_invoice_dates():
+    invoice_date = datetime.today().date()
+    days_until_due = int(input("Enter number of days until due: "))
+    due_date = invoice_date + timedelta(days=days_until_due)
+
+    print("\nInvoice dates generated successfully!")
+    print("Invoice Date:", invoice_date)
+    print("Due Date:", due_date)
+
+    return {
+        "invoice_date": invoice_date,
+        "due_date": due_date
+    }
+
 def main():
     profile = load_business_profile()
 
@@ -83,6 +99,6 @@ def main():
         profile = business_setup()
         save_business_profile(profile)
     client = get_client_details()
-
+    invoice_dates = get_invoice_dates()
 
 main()
