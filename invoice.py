@@ -92,6 +92,37 @@ def get_invoice_dates():
         "due_date": due_date
     }
 
+def collect_line_items():
+    items = []
+
+    while True:
+        description = input("Enter item description (or type 'done' to finish): ")
+
+        if description.lower() == "done":
+            break
+
+        quantity = int(input("Enter quantity: "))
+        unit_price = float(input("Enter unit price: "))
+
+        item = {
+            "description": description,
+            "quantity": quantity,
+            "unit_price": unit_price
+        }
+
+        items.append(item)
+
+    print("\nLine items collected successfully!")
+
+    for item in items:
+        print(
+            item["description"],
+            "| Qty:", item["quantity"],
+            "| Unit Price:", item["unit_price"]
+        )
+
+    return items
+
 def main():
     profile = load_business_profile()
 
@@ -100,5 +131,6 @@ def main():
         save_business_profile(profile)
     client = get_client_details()
     invoice_dates = get_invoice_dates()
+    items = collect_line_items()
 
 main()
