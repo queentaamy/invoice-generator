@@ -35,10 +35,37 @@ def save_business_profile(profile):
 
     print("Profile saved successfully!")
 
+#Load Data From 'business_profile.txt' File
+def load_business_profile():
+    try:
+        with open("business_profile.txt", "r") as file:
+            lines = file.readlines()
+            business_profile = {
+                "name": lines[0].strip().split(": ")[1],
+                "email": lines[1].strip().split(": ")[1],
+                "address": lines[2].strip().split(": ")[1],
+                "phone_number": lines[3].strip().split(": ")[1]
+            }
 
+            print ("\nBusiness profile loaded successfully!")
+            print("Name:", business_profile["name"])
+            print("Email:", business_profile["email"])
+            print("Address:", business_profile["address"])
+            print("Phone number:", business_profile["phone_number"])
+            
+            return business_profile
+        
+    except FileNotFoundError:
+        print("No business profile found. Please set up your business profile first.")
+        return None
+    
 def main():
-    profile = business_setup()
-    save_business_profile(profile)
+    profile = load_business_profile()
+
+    if profile is None:
+        profile = business_setup()
+        save_business_profile(profile)
+
 
 
 main()
