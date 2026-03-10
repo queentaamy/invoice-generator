@@ -9,6 +9,7 @@ def business_setup():
     business_address = input("Please enter your business address: ")
     business_phone_number = input("Please enter your business phone number: ")
 
+
     business_profile = {
         "name": business_name,
         "email": business_email,
@@ -59,13 +60,29 @@ def load_business_profile():
         print("No business profile found. Please set up your business profile first.")
         return None
     
+# Feature 2 Creating Invoice
+def get_client_details():
+    client_name = input("Enter client name: ")
+    client_email = input("Enter client email: ")
+
+    client = {
+        "name": client_name,
+        "email": client_email
+    }
+
+    print("\nClient details collected successfully!")
+    print("Client Name:", client["name"])
+    print("Client Email:", client["email"])
+
+    return client
+
 def main():
     profile = load_business_profile()
 
     if profile is None:
         profile = business_setup()
         save_business_profile(profile)
-
+    client = get_client_details()
 
 
 main()
