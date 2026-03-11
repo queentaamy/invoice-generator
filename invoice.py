@@ -58,7 +58,34 @@ def load_business_profile():
     except FileNotFoundError:
         print("No business profile found. Please set up your business profile first.")
         return None
-    
+
+def generate_invoice_number():
+    try:
+        with open("invoice_log.txt", "r") as file:
+            lines = file.readlines()
+            next_number = len(lines) + 1
+    except FileNotFoundError:
+        next_number = 1
+
+    invoice_number = f"INV-{next_number:03}"
+    print("Generated Invoice Number:", invoice_number)
+    return invoice_number
+
+def save_invoice(invoice_string, invoice_number, client_name):
+    safe_client_name = client_name.replace(" ", "_")
+    file_name = f"{invoice_number}_{safe_client_name}.txt"
+
+    with open(file_name, "w") as file:
+        file.write(invoice_string)
+
+    print("Invoice saved successfully as", file_name)
+
+def update_invoice_log(invoice_number, client_name, grand_total, invoice_date):
+    with open("invoice_log.txt", "a") as file:
+        file.write(f"{invoice_number}, {client_name}, {grand_total}, {invoice_date}\n")
+
+    print("Invoice log updated successfully!")
+
 def main():
     profile = load_business_profile()
 
@@ -66,6 +93,12 @@ def main():
         profile = business_setup()
         save_business_profile(profile)
 
+    invoice_number = generate_invoice_number()
+
+    sample_invoice = "INVOICE\nClient: MTN Ghana\nTotal Due: 4025"
+    save_invoice(sample_invoice, invoice_number, "MTN Ghana")
+
+    update_invoice_log(invoice_number, "MTN Ghana", 4025, "2026-03-11")
 
 
 main()
