@@ -71,14 +71,26 @@ def generate_invoice_number():
     print("Generated Invoice Number:", invoice_number)
     return invoice_number
 
+def save_invoice(invoice_string, invoice_number, client_name):
+    safe_client_name = client_name.replace(" ", "_")
+    file_name = f"{invoice_number}_{safe_client_name}.txt"
+
+    with open(file_name, "w") as file:
+        file.write(invoice_string)
+
+    print("Invoice saved successfully as", file_name)
+
 def main():
     profile = load_business_profile()
 
     if profile is None:
         profile = business_setup()
         save_business_profile(profile)
-        
-    generate_invoice_number()
+
+    invoice_number = generate_invoice_number()
+
+    sample_invoice = "INVOICE\nClient: MTN Ghana\nTotal Due: 4025"
+    save_invoice(sample_invoice, invoice_number, "MTN Ghana")
 
 
 main()
