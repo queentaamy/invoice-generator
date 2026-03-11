@@ -80,6 +80,12 @@ def save_invoice(invoice_string, invoice_number, client_name):
 
     print("Invoice saved successfully as", file_name)
 
+def update_invoice_log(invoice_number, client_name, grand_total, invoice_date):
+    with open("invoice_log.txt", "a") as file:
+        file.write(f"{invoice_number}, {client_name}, {grand_total}, {invoice_date}\n")
+
+    print("Invoice log updated successfully!")
+
 def main():
     profile = load_business_profile()
 
@@ -91,6 +97,8 @@ def main():
 
     sample_invoice = "INVOICE\nClient: MTN Ghana\nTotal Due: 4025"
     save_invoice(sample_invoice, invoice_number, "MTN Ghana")
+
+    update_invoice_log(invoice_number, "MTN Ghana", 4025, "2026-03-11")
 
 
 main()
