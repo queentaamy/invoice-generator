@@ -150,6 +150,39 @@ def calculate_totals(items):
         "grand_total": grand_total
     }
 
+def format_invoice(profile, client, invoice_dates, items, totals):
+    print("\n" + "=" * 40)
+    print("INVOICE")
+    print("=" * 40)
+
+    print("FROM:", profile["name"])
+    print(profile["address"])
+    print(profile["email"])
+    print(profile["phone_number"])
+
+    print("\nTO:", client["name"])
+    print(client["email"])
+
+    print("\nDate:", invoice_dates["invoice_date"])
+    print("Due Date:", invoice_dates["due_date"])
+
+    print("\n" + "-" * 40)
+    print("ITEM\tQTY\tPRICE\tTOTAL")
+    print("-" * 40)
+
+    for item in items:
+        line_total = item["quantity"] * item["unit_price"]
+        print(
+            f"{item['description']}\t{item['quantity']}\t"
+            f"{item['unit_price']}\t{line_total}"
+        )
+
+    print("-" * 40)
+    print("Subtotal:", totals["subtotal"])
+    print("Tax:", totals["tax"])
+    print("Total Due:", totals["grand_total"])
+    print("=" * 40)
+
 def main():
     profile = load_business_profile()
 
@@ -160,4 +193,5 @@ def main():
     invoice_dates = get_invoice_dates()
     items = collect_line_items()
     totals = calculate_totals(items)
+    format_invoice(profile, client, invoice_dates, items, totals)
 main()
