@@ -58,14 +58,27 @@ def load_business_profile():
     except FileNotFoundError:
         print("No business profile found. Please set up your business profile first.")
         return None
-    
+
+def generate_invoice_number():
+    try:
+        with open("invoice_log.txt", "r") as file:
+            lines = file.readlines()
+            next_number = len(lines) + 1
+    except FileNotFoundError:
+        next_number = 1
+
+    invoice_number = f"INV-{next_number:03}"
+    print("Generated Invoice Number:", invoice_number)
+    return invoice_number
+
 def main():
     profile = load_business_profile()
 
     if profile is None:
         profile = business_setup()
         save_business_profile(profile)
-
+        
+    generate_invoice_number()
 
 
 main()
