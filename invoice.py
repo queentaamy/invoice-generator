@@ -123,6 +123,33 @@ def collect_line_items():
 
     return items
 
+def calculate_totals(items):
+    subtotal = 0
+
+    for item in items:
+        item_total = item["quantity"] * item["unit_price"]
+        subtotal += item_total
+
+    tax_choice = input("Apply 15% tax? (yes/no): ").lower()
+
+    if tax_choice == "yes":
+        tax = subtotal * 0.15
+    else:
+        tax = 0
+
+    grand_total = subtotal + tax
+
+    print("\nTotals calculated successfully!")
+    print("Subtotal:", subtotal)
+    print("Tax:", tax)
+    print("Grand Total:", grand_total)
+
+    return {
+        "subtotal": subtotal,
+        "tax": tax,
+        "grand_total": grand_total
+    }
+
 def main():
     profile = load_business_profile()
 
@@ -132,5 +159,5 @@ def main():
     client = get_client_details()
     invoice_dates = get_invoice_dates()
     items = collect_line_items()
-
+    totals = calculate_totals(items)
 main()
