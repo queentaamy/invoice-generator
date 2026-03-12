@@ -1,22 +1,23 @@
-# Import modules for working with dates
+# Import modules used for working with dates
 from datetime import datetime, timedelta
 
-# Welcome message
+# Program welcome message
 welcome_msg = "Welcome to invoice generator!\nProgram started successfully!"
 print(welcome_msg)
 
 
-# -------------------------------
+# -------------------------------------------------
 # Feature 1 — Business Profile Setup
-# -------------------------------
+# -------------------------------------------------
+
+# Collect business details from the user
 def business_setup():
-    # Collect business details from user
     business_name = input("Please enter your business name: ")
     business_email = input("Please enter your business email: ")
     business_address = input("Please enter your business address: ")
     business_phone_number = input("Please enter your business phone number: ")
 
-    # Store the data in a dictionary
+    # Store business information in a dictionary
     business_profile = {
         "name": business_name,
         "email": business_email,
@@ -33,7 +34,7 @@ def business_setup():
     return business_profile
 
 
-# Save business profile to file
+# Save business profile to a file
 def save_business_profile(profile):
     with open("business_profile.txt", "w") as file:
         file.write("Name: " + profile["name"] + "\n")
@@ -70,50 +71,11 @@ def load_business_profile():
         return None
 
 
-# -------------------------------
-# Invoice Number Generation
-# -------------------------------
-def generate_invoice_number():
-    try:
-        with open("invoice_log.txt", "r") as file:
-            lines = file.readlines()
-            next_number = len(lines) + 1
-    except FileNotFoundError:
-        next_number = 1
+# -------------------------------------------------
+# Feature 2 — Create Invoice (Client + Dates + Items)
+# -------------------------------------------------
 
-    invoice_number = f"INV-{next_number:03}"
-    print("Generated Invoice Number:", invoice_number)
-    return invoice_number
-
-
-# -------------------------------
-# Save Invoice to File
-# -------------------------------
-def save_invoice(invoice_string, invoice_number, client_name):
-    safe_client_name = client_name.replace(" ", "_")
-    file_name = f"{invoice_number}_{safe_client_name}.txt"
-
-    with open(file_name, "w") as file:
-        file.write(invoice_string)
-
-    print("Invoice saved successfully as", file_name)
-
-
-# -------------------------------
-# Update Invoice Log
-# -------------------------------
-def update_invoice_log(invoice_number, client_name, grand_total, invoice_date):
-    with open("invoice_log.txt", "a") as file:
-        file.write(f"{invoice_number}, {client_name}, {grand_total}, {invoice_date}\n")
-
-    print("Invoice log updated successfully!")
-
-
-# -------------------------------
-# Feature 2 — Creating Invoice
-# -------------------------------
-
-# Get client details
+# Collect client details
 def get_client_details():
     client_name = input("Enter client name: ")
     client_email = input("Enter client email: ")
@@ -129,7 +91,11 @@ def get_client_details():
 # Generate invoice date and due date
 def get_invoice_dates():
     invoice_date = datetime.today().date()
+
+    # Ask user how many days until payment is due
     days_until_due = int(input("Enter number of days until due: "))
+
+    # Calculate due date
     due_date = invoice_date + timedelta(days=days_until_due)
 
     return {
@@ -138,13 +104,14 @@ def get_invoice_dates():
     }
 
 
-# Collect invoice items
+# Collect invoice line items
 def collect_line_items():
     items = []
 
     while True:
         description = input("Enter item description (or type 'done'): ")
 
+        # Stop collecting items when user types done
         if description.lower() == "done":
             break
 
@@ -160,13 +127,19 @@ def collect_line_items():
     return items
 
 
-# Calculate totals
+# -------------------------------------------------
+# Feature 3 — Calculations
+# -------------------------------------------------
+
+# Calculate subtotal, tax and grand total
 def calculate_totals(items):
     subtotal = 0
 
+    # Add up all line totals
     for item in items:
         subtotal += item["quantity"] * item["unit_price"]
 
+    # Ask whether tax should be applied
     tax_choice = input("Apply 15% tax? (yes/no): ").lower()
 
     if tax_choice == "yes":
@@ -183,35 +156,39 @@ def calculate_totals(items):
     }
 
 
-# -------------------------------
-# Format and Display Invoice
-# -------------------------------
-def format_invoice(profile, client, invoice_number, invoice_dates, items, totals):
+# -------------------------------------------------
+# Feature 4 — Format and Display Invoice
+# -------------------------------------------------
 
+# Format the invoice and display it in the terminal
+def format_invoice(profile, client, invoice_number, invoice_dates, items, totals):
     invoice_text = ""
+
     invoice_text += "=" * 60 + "\n"
     invoice_text += f"INVOICE - {invoice_number}\n"
     invoice_text += "=" * 60 + "\n"
 
-    # Business information
+    # Business details
     invoice_text += f"FROM: {profile['name']}\n"
     invoice_text += f"      {profile['address']} | {profile['email']}\n"
 
-    # Client information
+    # Client details
     invoice_text += f"TO:   {client['name']} | {client['email']}\n"
 
-    # Dates
+    # Date details
     invoice_text += f"Date: {invoice_dates['invoice_date']} | Due: {invoice_dates['due_date']}\n\n"
 
+    # Invoice item table header
     invoice_text += "-" * 60 + "\n"
     invoice_text += f"{'ITEM':<20}{'QTY':<10}{'PRICE':<10}{'TOTAL':<10}\n"
     invoice_text += "-" * 60 + "\n"
 
+    # Display each line item
     for item in items:
         line_total = item["quantity"] * item["unit_price"]
 
         invoice_text += (
-            f"{item['description']:<30}"
+            f"{item['description']:<20}"
             f"{item['quantity']:<10}"
             f"{item['unit_price']:<10.2f}"
             f"{line_total:<10.2f}\n"
@@ -219,7 +196,7 @@ def format_invoice(profile, client, invoice_number, invoice_dates, items, totals
 
     invoice_text += "-" * 60 + "\n"
 
-    # Totals section with spacing
+    # Totals section
     invoice_text += f"{'Subtotal:':<30}{totals['subtotal']:.2f}\n"
     invoice_text += f"{'Tax (15%):':<30}{totals['tax']:.2f}\n"
     invoice_text += f"{'TOTAL DUE:':<30}{totals['grand_total']:.2f}\n"
@@ -231,45 +208,161 @@ def format_invoice(profile, client, invoice_number, invoice_dates, items, totals
     return invoice_text
 
 
-# -------------------------------
-# Main Program Flow
-# -------------------------------
-def main():
+# -------------------------------------------------
+# Feature 5 — Save Invoice + Update Log
+# -------------------------------------------------
 
-    # Load business profile or create one
+# Generate invoice number automatically
+# This improved version reads the last invoice number
+# instead of just counting file lines
+def generate_invoice_number():
+    try:
+        with open("invoice_log.txt", "r") as file:
+            lines = file.readlines()
+
+        # If the file is empty, start from INV-001
+        if not lines:
+            return "INV-001"
+
+        # Get the invoice number from the last line
+        last_line = lines[-1]
+        last_invoice_number = last_line.split(",")[0].strip()
+
+        # Extract numeric part from something like INV-007
+        last_number = int(last_invoice_number.split("-")[1])
+
+        # Increment the number by 1
+        next_number = last_number + 1
+
+        return f"INV-{next_number:03}"
+
+    except FileNotFoundError:
+        return "INV-001"
+
+
+# Save invoice to a text file
+def save_invoice(invoice_string, invoice_number, client_name):
+    # Replace spaces with underscores for a safe filename
+    safe_client_name = client_name.replace(" ", "_")
+    file_name = f"{invoice_number}_{safe_client_name}.txt"
+
+    with open(file_name, "w") as file:
+        file.write(invoice_string)
+
+    print("Invoice saved successfully as", file_name)
+
+
+# Update invoice history log
+def update_invoice_log(invoice_number, client_name, grand_total, invoice_date):
+    with open("invoice_log.txt", "a") as file:
+        file.write(f"{invoice_number}, {client_name}, {grand_total:.2f}, {invoice_date}\n")
+
+    print("Invoice log updated successfully!")
+
+
+# -------------------------------------------------
+# Feature 6 — View Invoice History
+# -------------------------------------------------
+
+# Display all previous invoices in a table format
+def view_invoice_history():
+    try:
+        with open("invoice_log.txt", "r") as file:
+            lines = file.readlines()
+
+        # Check whether the file is empty
+        if not lines:
+            print("No invoice history found.")
+            return
+
+        print("\n" + "=" * 60)
+        print("INVOICE HISTORY")
+        print("=" * 60)
+
+        # Print table headings
+        print(f"{'Invoice No.':<15}{'Client':<20}{'Total':<12}{'Date':<15}")
+        print("-" * 60)
+
+        # Print each row of invoice history
+        for line in lines:
+            invoice_number, client, total, date = line.strip().split(",")
+
+            print(
+                f"{invoice_number.strip():<15}"
+                f"{client.strip():<20}"
+                f"{total.strip():<12}"
+                f"{date.strip():<15}"
+            )
+
+        print("=" * 60)
+
+    except FileNotFoundError:
+        print("No invoice history file found.")
+
+
+# -------------------------------------------------
+# Main Program Flow with Menu
+# -------------------------------------------------
+
+def main():
+    # Load existing business profile or create a new one
     profile = load_business_profile()
 
     if profile is None:
         profile = business_setup()
         save_business_profile(profile)
 
-    # Collect invoice information
-    client = get_client_details()
-    invoice_dates = get_invoice_dates()
-    items = collect_line_items()
+    # Keep showing the menu until user chooses Exit
+    while True:
+        print("\n----- INVOICE GENERATOR MENU -----")
+        print("1. Create Invoice")
+        print("2. View Invoice History")
+        print("3. Exit")
 
-    totals = calculate_totals(items)
+        choice = input("Choose an option: ")
 
-    invoice_number = generate_invoice_number()
+        # Option 1 — Create a new invoice
+        if choice == "1":
+            client = get_client_details()
+            invoice_dates = get_invoice_dates()
+            items = collect_line_items()
+            totals = calculate_totals(items)
+            invoice_number = generate_invoice_number()
 
-    invoice_string = format_invoice(
-        profile,
-        client,
-        invoice_number,
-        invoice_dates,
-        items,
-        totals
-    )
+            invoice_string = format_invoice(
+                profile,
+                client,
+                invoice_number,
+                invoice_dates,
+                items,
+                totals
+            )
 
-    save_invoice(invoice_string, invoice_number, client["name"])
+            save_invoice(invoice_string, invoice_number, client["name"])
 
-    update_invoice_log(
-        invoice_number,
-        client["name"],
-        totals["grand_total"],
-        invoice_dates["invoice_date"]
-    )
+            update_invoice_log(
+                invoice_number,
+                client["name"],
+                totals["grand_total"],
+                invoice_dates["invoice_date"]
+            )
+
+        # Option 2 — View invoice history separately
+        elif choice == "2":
+            print("\nDisplaying invoice history:")
+            view_invoice_history()
+            print("Invoice history displayed successfully!")
+            print("Returning to main menu...")
+
+        # Option 3 — Exit the program
+        elif choice == "3":
+            print("Exiting program...")
+            break
+
+        # Handle invalid menu input
+        else:
+            print("Invalid option. Please choose 1, 2, or 3.")
 
 
-# Run program
+# Run the program
 main()
