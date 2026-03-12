@@ -1,0 +1,8 @@
+# generated invoices
+*.txt
+
+# qr images
+qr_codes/
+
+# python cache
+__pycache__/
