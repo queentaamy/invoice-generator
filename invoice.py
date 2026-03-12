@@ -93,12 +93,27 @@ def main():
         profile = business_setup()
         save_business_profile(profile)
 
+    client = get_client_details()
+    invoice_dates = get_invoice_dates()
+    items = collect_line_items()
+    totals = calculate_totals(items)
     invoice_number = generate_invoice_number()
 
-    sample_invoice = "INVOICE\nClient: MTN Ghana\nTotal Due: 4025"
-    save_invoice(sample_invoice, invoice_number, "MTN Ghana")
+    invoice_string = format_invoice(
+        profile,
+        client,
+        invoice_number,
+        invoice_dates,
+        items,
+        totals
+    )
 
-    update_invoice_log(invoice_number, "MTN Ghana", 4025, "2026-03-11")
-
+    save_invoice(invoice_string, invoice_number, client["name"])
+    update_invoice_log(
+        invoice_number,
+        client["name"],
+        totals["grand_total"],
+        invoice_dates["invoice_date"]
+    )
 
 main()
