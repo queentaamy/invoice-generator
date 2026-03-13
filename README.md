@@ -1,8 +1,6 @@
 # invoice-generator
 Mini-project for Tech4Girls Cohort 4
 
-# Invoice Generator
-
 ## Project Overview
 The Invoice Generator is a command-line Python application that allows small businesses to generate professional invoices directly from the terminal. The program collects business details, client information, invoice items, performs automatic calculations, and generates a formatted invoice. Each invoice is saved as a file and recorded in an invoice history log.
 
