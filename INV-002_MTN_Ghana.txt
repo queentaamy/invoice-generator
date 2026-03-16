@@ -1,3 +1,0 @@
-INVOICE
-Client: MTN Ghana
-Total Due: 4025
