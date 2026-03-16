@@ -1,16 +1,16 @@
 # Import modules used for working with dates
+# datetime helps us get today's date
+# timedelta helps us calculate the due date by adding days
 from datetime import datetime, timedelta
 
-# Program welcome message
+
+# Welcome message displayed when the program starts
 welcome_msg = "Welcome to invoice generator!\nProgram started successfully!"
 print(welcome_msg)
 
 
-# -------------------------------------------------
-# Helper Validation Functions
-# -------------------------------------------------
-
-# Keep asking until user enters a non-empty value
+# This helper function ensures the user does not leave input empty
+# It keeps asking until a value is entered
 def get_non_empty_input(prompt):
     while True:
         value = input(prompt).strip()
@@ -21,7 +21,8 @@ def get_non_empty_input(prompt):
             return value
 
 
-# Keep asking until user enters a valid whole number
+# This helper function ensures the user enters a valid integer
+# It prevents the program from crashing if the user enters text
 def get_valid_int(prompt):
     while True:
         value = input(prompt).strip()
@@ -30,7 +31,7 @@ def get_valid_int(prompt):
             number = int(value)
 
             if number <= 0:
-                print("Please enter a whole number greater than 0.")
+                print("Please enter a number greater than 0.")
             else:
                 return number
 
@@ -38,7 +39,8 @@ def get_valid_int(prompt):
             print("Invalid input. Please enter a valid whole number.")
 
 
-# Keep asking until user enters a valid decimal/number
+# This helper function ensures the user enters a valid decimal number
+# It is used for prices where decimals may be needed
 def get_valid_float(prompt):
     while True:
         value = input(prompt).strip()
@@ -55,7 +57,7 @@ def get_valid_float(prompt):
             print("Invalid input. Please enter a valid number.")
 
 
-# Keep asking until user enters yes or no
+# This helper function validates yes/no responses
 def get_yes_no_input(prompt):
     while True:
         value = input(prompt).strip().lower()
@@ -66,18 +68,16 @@ def get_yes_no_input(prompt):
             print("Invalid input. Please type 'yes' or 'no'.")
 
 
-# -------------------------------------------------
-# Feature 1 — Business Profile Setup
-# -------------------------------------------------
+# Feature 1 — Business Profile
 
-# Collect business details from the user
+# This function collects business information from the user
+# The details are stored in a dictionary so they can be reused later
 def business_setup():
-    business_name = get_non_empty_input("Please enter your business name: ")
-    business_email = get_non_empty_input("Please enter your business email: ")
-    business_address = get_non_empty_input("Please enter your business address: ")
-    business_phone_number = get_non_empty_input("Please enter your business phone number: ")
+    business_name = get_non_empty_input("Enter your business name: ")
+    business_email = get_non_empty_input("Enter your business email: ")
+    business_address = get_non_empty_input("Enter your business address: ")
+    business_phone_number = get_non_empty_input("Enter your business phone number: ")
 
-    # Store business information in a dictionary
     business_profile = {
         "name": business_name,
         "email": business_email,
@@ -85,65 +85,47 @@ def business_setup():
         "phone_number": business_phone_number
     }
 
-    print("\nYour business information has been created!")
-    print("Name:", business_profile["name"])
-    print("Email:", business_profile["email"])
-    print("Address:", business_profile["address"])
-    print("Phone number:", business_profile["phone_number"])
-
     return business_profile
 
 
-# Save business profile to a file
+# This function saves the business profile to a file
+# Saving the data allows the program to load it automatically next time
 def save_business_profile(profile):
     with open("business_profile.txt", "w") as file:
         file.write("Name: " + profile["name"] + "\n")
         file.write("Email: " + profile["email"] + "\n")
         file.write("Address: " + profile["address"] + "\n")
-        file.write("Phone number: " + profile["phone_number"] + "\n")
+        file.write("Phone: " + profile["phone_number"] + "\n")
 
-    print("Profile saved successfully!")
+    print("Business profile saved successfully!")
 
 
-# Load business profile from file if it exists
+# This function loads the business profile from the file
+# If the file does not exist, the user will create a new profile
 def load_business_profile():
     try:
         with open("business_profile.txt", "r") as file:
             lines = file.readlines()
 
-            # Check that the file has the expected number of lines
-            if len(lines) < 4:
-                print("Business profile file is incomplete. Please set it up again.")
-                return None
-
-            business_profile = {
-                "name": lines[0].strip().split(": ", 1)[1],
-                "email": lines[1].strip().split(": ", 1)[1],
-                "address": lines[2].strip().split(": ", 1)[1],
-                "phone_number": lines[3].strip().split(": ", 1)[1]
+            profile = {
+                "name": lines[0].strip().split(": ")[1],
+                "email": lines[1].strip().split(": ")[1],
+                "address": lines[2].strip().split(": ")[1],
+                "phone_number": lines[3].strip().split(": ")[1]
             }
 
-            print("\nBusiness profile loaded successfully!")
-            print("Name:", business_profile["name"])
-            print("Email:", business_profile["email"])
-            print("Address:", business_profile["address"])
-            print("Phone number:", business_profile["phone_number"])
-
-            return business_profile
+            print("Business profile loaded successfully!")
+            return profile
 
     except FileNotFoundError:
-        print("No business profile found. Please set up your business profile first.")
-        return None
-    except IndexError:
-        print("Business profile file format is invalid. Please set it up again.")
+        print("No business profile found.")
         return None
 
 
-# -------------------------------------------------
-# Feature 2 — Create Invoice (Client + Dates + Items)
-# -------------------------------------------------
+# Feature 2 — Create Invoice
 
-# Collect client details
+# This function collects client details
+# The information is stored in a dictionary
 def get_client_details():
     client_name = get_non_empty_input("Enter client name: ")
     client_email = get_non_empty_input("Enter client email: ")
@@ -156,14 +138,14 @@ def get_client_details():
     return client
 
 
-# Generate invoice date and due date
+# This function generates invoice date and due date
+# datetime.today() gets the current date
+# timedelta adds the number of days until payment is due
 def get_invoice_dates():
     invoice_date = datetime.today().date()
 
-    # Ask user how many days until payment is due
     days_until_due = get_valid_int("Enter number of days until due: ")
 
-    # Calculate due date
     due_date = invoice_date + timedelta(days=days_until_due)
 
     return {
@@ -172,17 +154,17 @@ def get_invoice_dates():
     }
 
 
-# Collect invoice line items
+# This function collects invoice items from the user
+# Each item contains item name, quantity, and unit price
 def collect_line_items():
     items = []
 
     while True:
-        item_name = get_non_empty_input("Enter item (or type 'done'): ")
+        item_name = input("Enter item (or type 'done'): ")
 
-        # Stop collecting items when user types done
         if item_name.lower() == "done":
             if not items:
-                print("You must enter at least one item before finishing.")
+                print("You must enter at least one item.")
                 continue
             break
 
@@ -198,20 +180,19 @@ def collect_line_items():
     return items
 
 
-# -------------------------------------------------
 # Feature 3 — Calculations
-# -------------------------------------------------
 
-# Calculate subtotal, tax and grand total
+# This function calculates subtotal, tax, and grand total
+# It multiplies quantity and price for each item
+# All item totals are added together to get the subtotal
+# If the user selects tax, 15% is applied
 def calculate_totals(items):
     subtotal = 0
 
-    # Add up all line totals
     for item in items:
         line_total = item["quantity"] * item["unit_price"]
         subtotal += line_total
 
-    # Ask whether tax should be applied
     tax_choice = get_yes_no_input("Apply 15% tax? (yes/no): ")
 
     if tax_choice == "yes":
@@ -228,197 +209,155 @@ def calculate_totals(items):
     }
 
 
-# -------------------------------------------------
 # Feature 4 — Format and Display Invoice
-# -------------------------------------------------
 
-# Format the invoice and display it in the terminal
+# This function formats the invoice to display clearly in the terminal
+# It prints business details, client details, items table, and totals
 def format_invoice(profile, client, invoice_number, invoice_dates, items, totals):
-    invoice_text = ""
 
-    invoice_text += "=" * 60 + "\n"
-    invoice_text += f"INVOICE - {invoice_number}\n"
-    invoice_text += "=" * 60 + "\n"
+    print("\n===================================================")
+    print("INVOICE:", invoice_number)
+    print("===================================================")
 
-    # Business details
-    invoice_text += f"FROM: {profile['name']}\n"
-    invoice_text += f"      {profile['address']} | {profile['email']}\n"
+    print("FROM:", profile["name"])
+    print(profile["address"], "|", profile["email"])
 
-    # Client details
-    invoice_text += f"TO:   {client['name']} | {client['email']}\n"
+    print("\nTO:", client["name"], "|", client["email"])
 
-    # Date details
-    invoice_text += f"Date: {invoice_dates['invoice_date']} | Due: {invoice_dates['due_date']}\n\n"
+    print("\nDate:", invoice_dates["invoice_date"], "| Due:", invoice_dates["due_date"])
 
-    # Invoice item table header
-    invoice_text += "-" * 60 + "\n"
-    invoice_text += f"{'ITEMS':<20}{'QTY':<10}{'PRICE':<10}{'TOTAL':<10}\n"
-    invoice_text += "-" * 60 + "\n"
+    print("\n---------------------------------------------------")
+    print(f"{'ITEMS':<20}{'QTY':<10}{'PRICE':<10}{'TOTAL':<10}")
+    print("---------------------------------------------------")
 
-    # Display each line item
     for item in items:
-        line_total = item["quantity"] * item["unit_price"]
+        total = item["quantity"] * item["unit_price"]
 
-        invoice_text += (
+        print(
             f"{item['item']:<20}"
             f"{item['quantity']:<10}"
-            f"{item['unit_price']:<10.2f}"
-            f"{line_total:<10.2f}\n"
+            f"{item['unit_price']:<10}"
+            f"{total:<10}"
         )
 
-    invoice_text += "-" * 60 + "\n"
+    print("---------------------------------------------------")
 
-    # Totals section
-    invoice_text += f"{'Subtotal:':<20}{totals['subtotal']:.2f}\n"
-    invoice_text += f"{'Tax (15%):':<20}{totals['tax']:.2f}\n"
-    invoice_text += f"{'TOTAL DUE:':<20}{totals['grand_total']:.2f}\n"
+    print(f"{'Subtotal:':<20}{totals['subtotal']}")
+    print(f"{'Tax (15%):':<20}{totals['tax']}")
+    print(f"{'TOTAL DUE:':<20}{totals['grand_total']}")
 
-    invoice_text += "=" * 60 + "\n"
-
-    print("\n" + invoice_text)
-
-    return invoice_text
+    print("===================================================")
 
 
-# -------------------------------------------------
-# Feature 5 — Save Invoice + Update Log
-# -------------------------------------------------
+# Feature 5 — Save Invoice
 
-# Generate invoice number automatically
-# This improved version reads the last invoice number
-# instead of just counting file lines
+# This function generates a unique invoice number
+# It reads the last invoice number from invoice_log.txt
 def generate_invoice_number():
     try:
         with open("invoice_log.txt", "r") as file:
             lines = file.readlines()
 
-        # If the file is empty, start from INV-001
         if not lines:
             return "INV-001"
 
-        # Get the invoice number from the last line
         last_line = lines[-1]
-        last_invoice_number = last_line.split(",")[0].strip()
+        last_invoice_number = last_line.split(",")[0]
 
-        # Extract numeric part from something like INV-007
         last_number = int(last_invoice_number.split("-")[1])
 
-        # Increment the number by 1
         next_number = last_number + 1
 
         return f"INV-{next_number:03}"
 
     except FileNotFoundError:
         return "INV-001"
-    except (IndexError, ValueError):
-        print("Invoice log format is invalid. Restarting numbering from INV-001.")
-        return "INV-001"
 
 
-# Save invoice to a text file
-def save_invoice(invoice_string, invoice_number, client_name):
-    # Replace spaces with underscores for a safe filename
+# This function saves the invoice as a text file
+def save_invoice(invoice_number, client_name, totals):
+
     safe_client_name = client_name.replace(" ", "_")
+
     file_name = f"{invoice_number}_{safe_client_name}.txt"
 
     with open(file_name, "w") as file:
-        file.write(invoice_string)
+        file.write(f"Invoice Number: {invoice_number}\n")
+        file.write(f"Client: {client_name}\n")
+        file.write(f"Total Due: {totals['grand_total']}\n")
 
-    print("Invoice saved successfully as", file_name)
+    print("Invoice saved as", file_name)
 
 
-# Update invoice history log
-def update_invoice_log(invoice_number, client_name, grand_total, invoice_date):
+# This function updates invoice history
+def update_invoice_log(invoice_number, client_name, total, date):
+
     with open("invoice_log.txt", "a") as file:
-        file.write(f"{invoice_number}, {client_name}, {grand_total:.2f}, {invoice_date}\n")
-
-    print("Invoice log updated successfully!")
+        file.write(f"{invoice_number}, {client_name}, {total}, {date}\n")
 
 
-# -------------------------------------------------
 # Feature 6 — View Invoice History
-# -------------------------------------------------
 
-# Display all previous invoices in a table format
+# This function reads the invoice log file
+# It displays all previous invoices in a table
 def view_invoice_history():
     try:
         with open("invoice_log.txt", "r") as file:
             lines = file.readlines()
 
-        # Check whether the file is empty
-        if not lines:
-            print("No invoice history found.")
-            return
+        print("\n================ INVOICE HISTORY =================")
 
-        print("\n" + "=" * 60)
-        print("INVOICE HISTORY")
-        print("=" * 60)
+        print(f"{'Invoice No':<15}{'Client':<20}{'Total':<10}{'Date':<15}")
 
-        # Print table headings
-        print(f"{'Invoice No.':<15}{'Client':<20}{'Total':<12}{'Date':<15}")
-        print("-" * 60)
+        print("--------------------------------------------------")
 
-        # Print each row of invoice history
         for line in lines:
-            parts = line.strip().split(",")
-
-            if len(parts) != 4:
-                continue
-
-            invoice_number, client, total, date = parts
+            invoice_number, client, total, date = line.strip().split(",")
 
             print(
-                f"{invoice_number.strip():<15}"
-                f"{client.strip():<20}"
-                f"{total.strip():<12}"
-                f"{date.strip():<15}"
+                f"{invoice_number:<15}"
+                f"{client:<20}"
+                f"{total:<10}"
+                f"{date:<15}"
             )
 
-        print("=" * 60)
-
     except FileNotFoundError:
-        print("No invoice history file found.")
+        print("No invoice history found.")
 
 
-# -------------------------------------------------
-# Main Program Flow with Menu
-# -------------------------------------------------
-
+# Main function controls the program flow
 def main():
-    # Load existing business profile or create a new one
+
     profile = load_business_profile()
 
     if profile is None:
         profile = business_setup()
         save_business_profile(profile)
 
-    # Keep showing the menu until user chooses Exit
     while True:
-        print("\n----- INVOICE GENERATOR MENU -----")
+
+        print("\n===== INVOICE GENERATOR MENU =====")
         print("1. Create Invoice")
         print("2. View Invoice History")
         print("3. Exit")
 
-        choice = input("Choose an option: ").strip()
+        choice = input("Choose an option: ")
 
-        # Option 1 — Create a new invoice
         if choice == "1":
+
             client = get_client_details()
+
             invoice_dates = get_invoice_dates()
+
             items = collect_line_items()
+
             totals = calculate_totals(items)
+
             invoice_number = generate_invoice_number()
 
-            invoice_string = format_invoice(
-                profile,
-                client,
-                invoice_number,
-                invoice_dates,
-                items,
-                totals
-            )
+            format_invoice(profile, client, invoice_number, invoice_dates, items, totals)
 
-            save_invoice(invoice_string, invoice_number, client["name"])
+            save_invoice(invoice_number, client["name"], totals)
 
             update_invoice_log(
                 invoice_number,
@@ -427,19 +366,19 @@ def main():
                 invoice_dates["invoice_date"]
             )
 
-        # Option 2 — View invoice history separately
         elif choice == "2":
+
             view_invoice_history()
 
-        # Option 3 — Exit the program
         elif choice == "3":
+
             print("Exiting program...")
             break
 
-        # Handle invalid menu input
         else:
-            print("Invalid option. Please choose 1, 2, or 3.")
+
+            print("Invalid option. Please choose 1, 2 or 3.")
 
 
-# Run the program
+# This line runs the program
 main()
